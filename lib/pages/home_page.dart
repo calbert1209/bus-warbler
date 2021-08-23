@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bus_warbler/constants/bus_routes.dart';
 import 'package:bus_warbler/models/parse_html_page.dart';
+import 'package:bus_warbler/services/db.dart';
 import 'package:bus_warbler/state/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ Future<String> _fetchRoutePage(BusRouteUrlParts urlParts) async {
   return response.transform(utf8.decoder).join();
 }
 
-Future<void> _fetchAll() async {
+Future<List<ExtendedScheduleStop>> _fetchAll() async {
   var stops = <ExtendedScheduleStop>[];
   for (var entry in busRoutes.entries) {
     final route = entry.value;
@@ -36,6 +37,7 @@ Future<void> _fetchAll() async {
     }
   }
   print("Done: ${stops.length}stops");
+  return stops;
 }
 
 class HomePage extends StatelessWidget {
@@ -48,7 +50,9 @@ class HomePage extends StatelessWidget {
 
     appState.setLoading(true);
 
-    _fetchAll().whenComplete(() {
+    _fetchAll().then((stops) {
+      return appState.batchInsert(stops);
+    }).whenComplete(() {
       appState.setBody(DateTime.now().toIso8601String());
       appState.setLoading(false);
     });
@@ -61,17 +65,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Pre-MVP: Scrape Schedule Data'),
       ),
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-            if (appState.loading)
-              LinearProgressIndicator(
-                minHeight: 20.0,
-              ),
-            Text(appState.body)
-          ],
-        ),
-      ),
+      body: PageBody(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: appState.loading ? Colors.grey : Colors.green,
         onPressed: () => _fetchAndParse(appState),
@@ -80,4 +74,58 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+}
+
+class PageBody extends StatelessWidget {
+  const PageBody({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    return FutureBuilder(
+      future: appState.queryAll(),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<List<Map<String, dynamic>>> snapshot,
+      ) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              snapshot.error!.toString(),
+            ),
+          );
+        } else if (!snapshot.hasData) {
+          return Center(
+            child: LinearProgressIndicator(
+              minHeight: 20.0,
+            ),
+          );
+        } else {
+          print(snapshot.data!.toString());
+          return Center(
+            child: ListView(
+              children: [
+                ...snapshot.data!.map((item) {
+                  final text = hasStopKeys(item)
+                      ? '${item[DatabaseConstants.hour]} : ${item[DatabaseConstants.minute]}'
+                      : 'no go bro!';
+                  return Text(text);
+                })
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+bool hasStopKeys(Map<String, dynamic> item) {
+  return [
+    DatabaseConstants.mod,
+    DatabaseConstants.hour,
+    DatabaseConstants.minute,
+    DatabaseConstants.type,
+    DatabaseConstants.note,
+  ].every((key) => item.containsKey(key));
 }

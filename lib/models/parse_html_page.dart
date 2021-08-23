@@ -1,3 +1,5 @@
+import 'package:bus_warbler/services/db.dart';
+
 class SerialHtml {
   SerialHtml(this._html);
 
@@ -44,16 +46,58 @@ class PageSchedules {
   final List<ScheduleStop> stops;
 }
 
+enum Route {
+  kanaiTotsuka,
+  totsukaKanai,
+  kanaiOfuna,
+  ofunaKanai,
+}
+
+String _tryToRomanizeRoutePoint(String text) {
+  if (text.contains('金井')) {
+    return 'kanai';
+  } else if (text.contains('戸塚')) {
+    return 'totsuka';
+  } else if (text.contains('大船')) {
+    return 'ofuna';
+  } else {
+    throw RangeError('"$text" out of range');
+  }
+}
+
+Route routeFromPoints(String start, String destination) {
+  final romanStart = _tryToRomanizeRoutePoint(start);
+  final romanDest = _tryToRomanizeRoutePoint(destination);
+  final routeString = '${romanStart}_$romanDest';
+  switch (routeString) {
+    case 'kanai_totsuka':
+      return Route.kanaiTotsuka;
+    case 'totsuka_ofuna':
+      return Route.totsukaKanai;
+    case 'totsuka_totsuka':
+      // 戸塚バスセンター -> 戸塚台循環
+      return start.contains('バスセンター') ? Route.totsukaKanai : Route.kanaiTotsuka;
+    case 'kanai_ofuna':
+      return Route.kanaiOfuna;
+    case 'ofuna_totsuka':
+      return Route.ofunaKanai;
+    default:
+      throw RangeError('$start -> $destination not valid as Route');
+  }
+}
+
 class PageHeader {
   PageHeader._({
     required this.name,
     required this.destination,
+    required this.route,
     required this.publishDate,
     required this.fetchDate,
   });
 
   final String name;
   final String destination;
+  final Route route;
   final DateTime publishDate;
   final DateTime fetchDate;
 
@@ -69,6 +113,7 @@ class PageHeader {
     return PageHeader._(
       name: name,
       destination: dest,
+      route: routeFromPoints(name, dest),
       publishDate: publishDate,
       fetchDate: DateTime.now(),
     );
@@ -200,4 +245,12 @@ class ExtendedScheduleStop {
 
   final PageHeader header;
   final ScheduleStop stop;
+
+  Map<String, dynamic> toEntityMap() => {
+        '${DatabaseConstants.mod}': (stop.hour * 60) + stop.minute,
+        '${DatabaseConstants.hour}': stop.hour,
+        '${DatabaseConstants.minute}': stop.minute,
+        '${DatabaseConstants.type}': stop.type.index,
+        '${DatabaseConstants.note}': stop.note,
+      };
 }
