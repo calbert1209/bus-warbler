@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 Future<String> _fetchRoutePage(BusRouteUrlParts urlParts) async {
-// https://www.kanachu.co.jp/dia/diagram/send?cs=0000800324-12&nid=00126844&chk=all&dts=1613761200
   final url = Uri.https(
     "www.kanachu.co.jp",
     "/dia/diagram/send",
@@ -43,19 +42,25 @@ Future<List<ExtendedScheduleStop>> _fetchAll() async {
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
 
-  void _fetchAndParse(AppState appState) {
+  void _fetchAndParse(AppState appState) async {
     if (appState.loading) {
       return;
     }
 
-    appState.setLoading(true);
+    if (appState.hasStops) {
+      return;
+    }
 
-    _fetchAll().then((stops) {
-      return appState.batchInsert(stops);
-    }).whenComplete(() {
+    appState.loading = true;
+
+    try {
+      final stops = await _fetchAll();
+      await appState.batchInsert(stops);
+    } finally {
       appState.setBody(DateTime.now().toIso8601String());
-      appState.setLoading(false);
-    });
+      appState.loading = false;
+      appState.hasStops = true;
+    }
   }
 
   @override
@@ -82,12 +87,9 @@ class PageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    return FutureBuilder(
-      future: appState.queryAll(),
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<List<Map<String, dynamic>>> snapshot,
-      ) {
+    return FutureBuilder<Iterable<ScheduleStop>>(
+      future: appState.queryAll(DBConsts.kanaiOfuna),
+      builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
             child: Text(
@@ -105,12 +107,29 @@ class PageBody extends StatelessWidget {
           return Center(
             child: ListView(
               children: [
-                ...snapshot.data!.map((item) {
-                  final text = hasStopKeys(item)
-                      ? '${item[DatabaseConstants.hour]} : ${item[DatabaseConstants.minute]}'
-                      : 'no go bro!';
-                  return Text(text);
-                })
+                ...snapshot.data!
+                    .where(
+                      (item) => item.index > 9 * 60 && item.index <= 10 * 60,
+                    )
+                    .take(3)
+                    .map(
+                      (item) => Card(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+                          child: Flexible(
+                            flex: 1,
+                            child: Center(
+                              child: Text(
+                                '${item.timeString}',
+                                style: TextStyle(
+                                  fontSize: 48,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
               ],
             ),
           );
@@ -118,14 +137,4 @@ class PageBody extends StatelessWidget {
       },
     );
   }
-}
-
-bool hasStopKeys(Map<String, dynamic> item) {
-  return [
-    DatabaseConstants.mod,
-    DatabaseConstants.hour,
-    DatabaseConstants.minute,
-    DatabaseConstants.type,
-    DatabaseConstants.note,
-  ].every((key) => item.containsKey(key));
 }

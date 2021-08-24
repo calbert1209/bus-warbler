@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bus_warbler/models/parse_html_page.dart';
 import 'package:bus_warbler/services/db.dart';
 import 'package:flutter/material.dart';
@@ -6,11 +8,20 @@ class AppState with ChangeNotifier {
   AppState(this._databaseService);
 
   final DatabaseService _databaseService;
-  bool loading = false;
+  bool _loading = false;
+  bool _hasStops = false;
   String body = "";
+  Map<String, Iterable<ScheduleStop>> _stopCache = {};
 
-  void setLoading(bool value) {
-    loading = value;
+  bool get loading => _loading;
+  set loading(bool value) {
+    _loading = value;
+    notifyListeners();
+  }
+
+  bool get hasStops => _hasStops;
+  set hasStops(bool value) {
+    _hasStops = value;
     notifyListeners();
   }
 
@@ -23,7 +34,13 @@ class AppState with ChangeNotifier {
     return _databaseService.batchInsert(stops);
   }
 
-  Future<List<Map<String, dynamic>>> queryAll() {
-    return _databaseService.queryAll(DatabaseConstants.kanaiOfuna);
+  Future<Iterable<ScheduleStop>> queryAll(String tableName) async {
+    if (!_stopCache.containsKey(tableName) || _stopCache[tableName] == null) {
+      final results = await _databaseService.queryAll(tableName);
+      _stopCache[tableName] = results;
+    }
+
+    // _stopCache[tableName] could never be null
+    return Future.value(_stopCache[tableName]!);
   }
 }

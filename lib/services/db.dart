@@ -4,7 +4,7 @@ import 'package:bus_warbler/models/parse_html_page.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class DatabaseConstants {
+class DBConsts {
   static String dbName = 'bus_warbler.db';
 
   static String kanaiOfuna = 'kanai_ofuna';
@@ -63,6 +63,11 @@ create table $tableName (
         throw RangeError('route: ${route.toString()}');
     }
   }
+
+  static bool hasStopKeys(Map<String, dynamic> item) {
+    return [mod, hour, minute, type, note]
+        .every((key) => item.containsKey(key));
+  }
 }
 
 class DatabaseService {
@@ -71,7 +76,7 @@ class DatabaseService {
 
   static _onCreate(Database db, int version) async {
     final batch = db.batch();
-    for (var query in DatabaseConstants.tableCreationQueries) {
+    for (var query in DBConsts.tableCreationQueries) {
       batch.execute(query);
     }
 
@@ -88,7 +93,7 @@ class DatabaseService {
 
   Future<void> _lazyInitialize() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, DatabaseConstants.dbName);
+    final path = join(dbPath, DBConsts.dbName);
 
     try {
       await Directory(dbPath).create(recursive: true);
@@ -111,15 +116,18 @@ class DatabaseService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> queryAll(String tableName) async {
-    DatabaseConstants.assertTableName(tableName);
+  Future<Iterable<ScheduleStop>> queryAll(String tableName) async {
+    DBConsts.assertTableName(tableName);
 
     await _ensureOpened();
-    return this._database.query(tableName);
+    final results = await this._database.query(tableName);
+    return results
+        .where(DBConsts.hasStopKeys)
+        .map((item) => ScheduleStop.fromMap(item));
   }
 
   Future<int> insert(String table, ExtendedScheduleStop stop) async {
-    DatabaseConstants.assertTableName(table);
+    DBConsts.assertTableName(table);
 
     await _ensureOpened();
     return _database.insert(table, stop.toEntityMap());
@@ -130,7 +138,7 @@ class DatabaseService {
     await _ensureOpened();
     var batch = _database.batch();
     for (var stop in stops) {
-      final table = DatabaseConstants.toTableName(stop.header.route);
+      final table = DBConsts.toTableName(stop.header.route);
       batch.insert(table, stop.toEntityMap());
     }
 

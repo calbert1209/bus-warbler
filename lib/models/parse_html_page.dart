@@ -235,6 +235,21 @@ class ScheduleStop {
   final StopType type;
 
   int get index => (hour * 60) + minute;
+  String _doubleDigits(int i) => i < 10 ? '0' + i.toString() : i.toString();
+  String get timeString => '${_doubleDigits(hour)}:${_doubleDigits(minute)}';
+
+  factory ScheduleStop.fromMap(Map<String, dynamic> map) {
+    assert(
+      DBConsts.hasStopKeys(map),
+      "map should have keys needed to create stop",
+    );
+    return ScheduleStop(
+      hour: map[DBConsts.hour],
+      minute: map[DBConsts.minute],
+      type: StopType.values[map[DBConsts.type]],
+      note: map[DBConsts.note],
+    );
+  }
 }
 
 class ExtendedScheduleStop {
@@ -247,10 +262,10 @@ class ExtendedScheduleStop {
   final ScheduleStop stop;
 
   Map<String, dynamic> toEntityMap() => {
-        '${DatabaseConstants.mod}': (stop.hour * 60) + stop.minute,
-        '${DatabaseConstants.hour}': stop.hour,
-        '${DatabaseConstants.minute}': stop.minute,
-        '${DatabaseConstants.type}': stop.type.index,
-        '${DatabaseConstants.note}': stop.note,
+        '${DBConsts.mod}': (stop.hour * 60) + stop.minute,
+        '${DBConsts.hour}': stop.hour,
+        '${DBConsts.minute}': stop.minute,
+        '${DBConsts.type}': stop.type.index,
+        '${DBConsts.note}': stop.note,
       };
 }
