@@ -1,20 +1,21 @@
-import 'package:bus_warbler/services/db.dart';
+import 'package:bus_warbler/constants/db_consts.dart';
+import 'package:bus_warbler/models/schedule_stop.dart';
 
 class SerialHtml {
   SerialHtml(this._html);
 
   final String _html;
 
-  PageSchedules sections() {
+  _PageSchedules sections() {
     final trimmed = _html.split("<pre>")[1].split("</pre>")[0];
     final sections = trimmed.split("■");
-    return PageSchedules.fromList(sections);
+    return _PageSchedules.fromList(sections);
   }
 
   Iterable<ExtendedScheduleStop> stops() {
     final trimmed = _html.split("<pre>")[1].split("</pre>")[0];
     final sections = trimmed.split("■");
-    final schedules = PageSchedules.fromList(sections);
+    final schedules = _PageSchedules.fromList(sections);
     return schedules.stops.map((stop) => ExtendedScheduleStop(
           header: schedules.header,
           stop: stop,
@@ -22,27 +23,27 @@ class SerialHtml {
   }
 }
 
-class PageSchedules {
-  PageSchedules._({
+class _PageSchedules {
+  _PageSchedules._({
     required this.header,
     required this.stops,
   });
 
-  factory PageSchedules.fromList(List<String> list) {
+  factory _PageSchedules.fromList(List<String> list) {
     if (list.length <= 3) {
       throw ("list must have length > 3");
     }
 
-    final weekday = ScheduleLines.fromSection(list[1]).toStops();
-    final saturday = ScheduleLines.fromSection(list[2]).toStops();
-    final holiday = ScheduleLines.fromSection(list[3]).toStops();
+    final weekday = _ScheduleLines.fromSection(list[1]).toStops();
+    final saturday = _ScheduleLines.fromSection(list[2]).toStops();
+    final holiday = _ScheduleLines.fromSection(list[3]).toStops();
 
-    return PageSchedules._(
-        header: PageHeader.parse(list[0]),
+    return _PageSchedules._(
+        header: _PageHeader.parse(list[0]),
         stops: [...weekday, ...saturday, ...holiday]);
   }
 
-  final PageHeader header;
+  final _PageHeader header;
   final List<ScheduleStop> stops;
 }
 
@@ -86,8 +87,8 @@ Route routeFromPoints(String start, String destination) {
   }
 }
 
-class PageHeader {
-  PageHeader._({
+class _PageHeader {
+  _PageHeader._({
     required this.name,
     required this.destination,
     required this.route,
@@ -104,13 +105,13 @@ class PageHeader {
   static String _firstMatchFirstGroup(String pattern, String haystack) =>
       RegExp(pattern).firstMatch(haystack)!.group(1)!;
 
-  factory PageHeader.parse(String text) {
+  factory _PageHeader.parse(String text) {
     final name = _firstMatchFirstGroup(r"^ﾊﾞｽ停名：(.*)", text);
     final dest = _firstMatchFirstGroup(r"行先：(.*)\n", text);
     final publish =
         _firstMatchFirstGroup(r"改正日：([\d\/]*)", text).replaceAll(r"/", "-");
     final publishDate = DateTime.parse(publish);
-    return PageHeader._(
+    return _PageHeader._(
       name: name,
       destination: dest,
       route: routeFromPoints(name, dest),
@@ -120,18 +121,18 @@ class PageHeader {
   }
 }
 
-class ScheduleLine {
-  ScheduleLine._(this.hour, this.minutes);
+class _ScheduleLine {
+  _ScheduleLine._(this.hour, this.minutes);
 
   final int hour;
-  final List<ScheduleMinute> minutes;
+  final List<_ScheduleMinute> minutes;
 
-  factory ScheduleLine.fromLine(String line) {
+  factory _ScheduleLine.fromLine(String line) {
     final split = line.split("時 ");
     final hour = int.parse(split[0]);
     final minutes =
-        split[1].split(" . ").map((text) => ScheduleMinute.parse(text));
-    return ScheduleLine._(hour, [...minutes]);
+        split[1].split(" . ").map((text) => _ScheduleMinute.parse(text));
+    return _ScheduleLine._(hour, [...minutes]);
   }
 
   Iterable<ScheduleStop> toStops(StopType type) {
@@ -144,32 +145,32 @@ class ScheduleLine {
   }
 }
 
-class ScheduleMinute {
-  ScheduleMinute._(this.value, this.note);
+class _ScheduleMinute {
+  _ScheduleMinute._(this.value, this.note);
 
   final int value;
   final String? note;
 
-  factory ScheduleMinute.parse(String dirty) {
+  factory _ScheduleMinute.parse(String dirty) {
     final delimiter = ",";
     final split =
         dirty.replaceAll(RegExp(r"[\(\)]"), delimiter).split(delimiter);
     final note = split.length > 1 ? split[1] : null;
-    return ScheduleMinute._(int.parse(split[0]), note);
+    return _ScheduleMinute._(int.parse(split[0]), note);
   }
 }
 
-class ScheduleLines {
-  ScheduleLines._(this.type, this.lines);
+class _ScheduleLines {
+  _ScheduleLines._(this.type, this.lines);
 
   final StopType type;
-  final List<ScheduleLine> lines;
+  final List<_ScheduleLine> lines;
 
-  factory ScheduleLines.fromSection(String section) {
+  factory _ScheduleLines.fromSection(String section) {
     final hasMatch =
         (String pattern, String haystack) => RegExp(pattern).hasMatch(haystack);
     final split = section.split("\n");
-    var lines = <ScheduleLine>[];
+    var lines = <_ScheduleLine>[];
     var last = "";
     for (var i = split.length - 2; i >= 0; i--) {
       final line = split[i];
@@ -186,12 +187,12 @@ class ScheduleLines {
 
       // Most lines have minutes. Just in case, we'll include any orphans.
       if (hasMatch(r"^\d+時\s", line)) {
-        lines.add(ScheduleLine.fromLine("$line $last"));
+        lines.add(_ScheduleLine.fromLine("$line $last"));
       } else {
         last = line;
       }
     }
-    return ScheduleLines._(
+    return _ScheduleLines._(
       parseStopType(split[0]),
       [...lines.reversed],
     );
@@ -207,58 +208,13 @@ class ScheduleLines {
   }
 }
 
-enum StopType { Weekday, Saturday, Holiday }
-
-StopType parseStopType(String text) {
-  if (text[0] == "平") {
-    return StopType.Weekday;
-  } else if (text[0] == "土") {
-    return StopType.Saturday;
-  } else if (text[0] == "休") {
-    return StopType.Holiday;
-  } else {
-    throw ("could not parse: ${text.substring(0, 8)}...");
-  }
-}
-
-class ScheduleStop {
-  ScheduleStop({
-    required this.hour,
-    required this.minute,
-    required this.note,
-    required this.type,
-  });
-
-  final int hour;
-  final int minute;
-  final String? note;
-  final StopType type;
-
-  int get index => (hour * 60) + minute;
-  String _doubleDigits(int i) => i < 10 ? '0' + i.toString() : i.toString();
-  String get timeString => '${_doubleDigits(hour)}:${_doubleDigits(minute)}';
-
-  factory ScheduleStop.fromMap(Map<String, dynamic> map) {
-    assert(
-      DBConsts.hasStopKeys(map),
-      "map should have keys needed to create stop",
-    );
-    return ScheduleStop(
-      hour: map[DBConsts.hour],
-      minute: map[DBConsts.minute],
-      type: StopType.values[map[DBConsts.type]],
-      note: map[DBConsts.note],
-    );
-  }
-}
-
 class ExtendedScheduleStop {
   ExtendedScheduleStop({
     required this.header,
     required this.stop,
   });
 
-  final PageHeader header;
+  final _PageHeader header;
   final ScheduleStop stop;
 
   Map<String, dynamic> toEntityMap() => {

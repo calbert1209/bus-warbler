@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bus_warbler/constants/bus_routes.dart';
-import 'package:bus_warbler/models/parse_html_page.dart';
-import 'package:bus_warbler/services/db.dart';
+import 'package:bus_warbler/constants/db_consts.dart';
+import 'package:bus_warbler/models/schedule_stop.dart';
+import 'package:bus_warbler/models/serial_html.dart';
 import 'package:bus_warbler/state/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
