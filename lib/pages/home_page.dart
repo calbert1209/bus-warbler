@@ -6,6 +6,7 @@ import 'package:bus_warbler/constants/db_consts.dart';
 import 'package:bus_warbler/models/schedule_stop.dart';
 import 'package:bus_warbler/models/serial_html.dart';
 import 'package:bus_warbler/state/app_state.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -85,6 +86,19 @@ class HomePage extends StatelessWidget {
 class PageBody extends StatelessWidget {
   const PageBody({Key? key}) : super(key: key);
 
+  bool _isInTimeWindow(ScheduleStop stop) {
+    var now = DateTime.now();
+    if (now.hour > 22) {
+      now = now.subtract(Duration(hours: 12));
+    } else if (now.hour < 7) {
+      now = now.add(Duration(hours: 10));
+    }
+
+    final indexNow = (now.hour * 60) + now.minute;
+
+    return stop.index > indexNow && stop.index <= (indexNow + 60);
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -105,26 +119,21 @@ class PageBody extends StatelessWidget {
           );
         } else {
           print(snapshot.data!.toString());
+          final _fakeTime = kDebugMode &&
+              (DateTime.now().hour > 22 || DateTime.now().hour < 7);
           return Center(
             child: ListView(
               children: [
-                ...snapshot.data!
-                    .where(
-                      (item) => item.index > 9 * 60 && item.index <= 10 * 60,
-                    )
-                    .take(3)
-                    .map(
-                      (item) => Card(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
-                          child: Flexible(
-                            flex: 1,
-                            child: Center(
-                              child: Text(
-                                '${item.timeString}',
-                                style: TextStyle(
-                                  fontSize: 48,
-                                ),
+                ...snapshot.data!.where(_isInTimeWindow).take(3).map(
+                      (item) => Padding(
+                        padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+                        child: Flexible(
+                          flex: 1,
+                          child: Center(
+                            child: Text(
+                              '${_fakeTime ? '▵' : ''}${item.timeString}',
+                              style: TextStyle(
+                                fontSize: 48,
                               ),
                             ),
                           ),
