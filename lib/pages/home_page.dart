@@ -31,9 +31,7 @@ Future<List<ExtendedScheduleStop>> _fetchAll() async {
 
     for (var part in route.parts) {
       final resp = await _fetchRoutePage(part);
-      print(route.nickname);
       final someStops = SerialHtml(resp).stops();
-      print(someStops.length);
       stops.addAll(someStops);
     }
   }
@@ -118,7 +116,6 @@ class PageBody extends StatelessWidget {
             ),
           );
         } else {
-          print(snapshot.data!.toString());
           final _fakeTime = kDebugMode &&
               (DateTime.now().hour > 22 || DateTime.now().hour < 7);
           return Center(
@@ -127,16 +124,21 @@ class PageBody extends StatelessWidget {
                 ...snapshot.data!.where(_isInTimeWindow).take(3).map(
                       (item) => Padding(
                         padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
-                        child: Flexible(
-                          flex: 1,
-                          child: Center(
-                            child: Text(
-                              '${_fakeTime ? '▵' : ''}${item.timeString}',
-                              style: TextStyle(
-                                fontSize: 48,
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            Flexible(
+                              flex: 1,
+                              child: Center(
+                                child: Text(
+                                  '${_fakeTime ? '▵' : ''}${item.timeString}',
+                                  style: TextStyle(
+                                    fontSize: 48,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     )
