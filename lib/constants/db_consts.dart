@@ -8,19 +8,17 @@ class DBConsts {
   static String kanaiTotsuka = 'kanai_totsuka';
   static String totsukaKanai = 'totsuka_kanai';
 
-  static Iterable<String> tableCreationQueries = [
+  static Iterable<String> tableNames = [
     kanaiOfuna,
     ofunaKanai,
     kanaiTotsuka,
     totsukaKanai
-  ].map(_tableCreationSql);
+  ];
 
-  static bool isTableName(String name) => [
-        kanaiOfuna,
-        ofunaKanai,
-        kanaiTotsuka,
-        totsukaKanai,
-      ].toSet().contains(name);
+  static Iterable<String> tableCreationQueries =
+      tableNames.map(_tableCreationSql);
+
+  static bool isTableName(String name) => tableNames.toSet().contains(name);
 
   static assertTableName(String name) {
     assert(isTableName(name), '$name is not a valid table name');

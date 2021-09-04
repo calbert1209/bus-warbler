@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bus_warbler/constants/db_consts.dart';
 import 'package:bus_warbler/models/schedule_stop.dart';
 import 'package:bus_warbler/models/serial_html.dart';
 import 'package:bus_warbler/services/db.dart';
@@ -11,7 +12,7 @@ class AppState with ChangeNotifier {
   final DatabaseService _databaseService;
   bool _loading = false;
   bool _hasStops = false;
-  String body = "";
+  String _route = ''; //DBConsts.kanaiTotsuka;
   Map<String, Iterable<ScheduleStop>> _stopCache = {};
 
   bool get loading => _loading;
@@ -26,8 +27,17 @@ class AppState with ChangeNotifier {
     notifyListeners();
   }
 
-  void setBody(String value) {
-    body = value;
+  String get route => _route;
+
+  /// Sets route to [value] of type [String] or [null].
+  ///
+  /// (!) Will throw assertion error if [value] is not constant value from [DBConsts]
+  set route(String value) {
+    if (value != '') {
+      DBConsts.assertTableName(value);
+    }
+
+    _route = value;
     notifyListeners();
   }
 
@@ -43,5 +53,18 @@ class AppState with ChangeNotifier {
 
     // _stopCache[tableName] could never be null
     return Future.value(_stopCache[tableName]!);
+  }
+
+  Future<Iterable<ScheduleStop>> queryAllForCurrentRoute() async {
+    assert(this._route != '', '_route should not be an empty string');
+
+    return this.queryAll(this._route);
+    // if (!_stopCache.containsKey(tableName) || _stopCache[tableName] == null) {
+    //   final results = await _databaseService.queryAll(tableName);
+    //   _stopCache[tableName] = results;
+    // }
+
+    // // _stopCache[tableName] could never be null
+    // return Future.value(_stopCache[tableName]!);
   }
 }

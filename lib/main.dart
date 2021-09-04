@@ -1,7 +1,7 @@
 import 'package:bus_warbler/services/db.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bus_warbler/pages/home_page.dart';
+import 'package:bus_warbler/pages/home.dart';
 import 'package:bus_warbler/state/app_state.dart';
 
 void main() {
