@@ -62,13 +62,13 @@ class RouteSelectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    final lightGrey = Colors.grey.shade500;
+    final lightGrey = Colors.grey.shade600;
     final darkGrey = Colors.grey.shade700;
     final foregroundGreen = Colors.lightGreen.shade300;
     return Scaffold(
-      backgroundColor: lightGrey,
+      backgroundColor: darkGrey,
       appBar: AppBar(
-        backgroundColor: darkGrey,
+        backgroundColor: lightGrey,
         title: Text('Pick a route',
             style: TextStyle(
               color: foregroundGreen,
@@ -85,10 +85,11 @@ class RouteSelectPage extends StatelessWidget {
                   appState.route = name;
                 },
                 style: ButtonStyle(
+                  elevation: MaterialStateProperty.resolveWith((states) => 0.5),
                   padding: MaterialStateProperty.resolveWith(
                       (states) => EdgeInsets.all(16.0)),
                   backgroundColor:
-                      MaterialStateColor.resolveWith((states) => darkGrey),
+                      MaterialStateColor.resolveWith((states) => lightGrey),
                 ),
                 child: Text(
                   name,
@@ -103,11 +104,12 @@ class RouteSelectPage extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: appState.loading ? Colors.grey : Colors.lightGreen,
+        elevation: 2.0,
+        backgroundColor: appState.loading ? Colors.grey : foregroundGreen,
         onPressed: () => _fetchAndParse(appState),
         child: Icon(
           Icons.replay_outlined,
-          color: Colors.white,
+          color: darkGrey,
         ),
       ),
     );

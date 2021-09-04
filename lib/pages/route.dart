@@ -11,15 +11,27 @@ class RoutePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
 
+    final lightGrey = Colors.grey.shade600;
+    final darkGrey = Colors.grey.shade700;
+    final foregroundGreen = Colors.lightGreen.shade300;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(appState.route),
+        title: Text(
+          appState.route,
+          style: TextStyle(
+            color: foregroundGreen,
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => appState.route = '',
+          color: foregroundGreen,
         ),
+        backgroundColor: lightGrey,
       ),
       body: PageBody(),
+      backgroundColor: darkGrey,
     );
   }
 }
@@ -98,6 +110,7 @@ class StopTimeListItem extends StatelessWidget {
                 '${_fakeTime ? '▵' : ''}${item.timeString}',
                 style: TextStyle(
                   fontSize: 48,
+                  color: Colors.lightGreen.shade300,
                 ),
               ),
             ),
