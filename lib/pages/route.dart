@@ -65,11 +65,7 @@ class PageBody extends StatelessWidget {
             ),
           );
         } else if (!snapshot.hasData) {
-          return Center(
-            child: LinearProgressIndicator(
-              minHeight: 20.0,
-            ),
-          );
+          return LinearProgressIndicator();
         } else {
           return Center(
             child: ListView(

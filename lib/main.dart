@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:bus_warbler/pages/home.dart';
 import 'package:bus_warbler/state/app_state.dart';
 
+final lightGrey = Colors.grey.shade600;
+final darkGrey = Colors.grey.shade700;
+final textGreen = Colors.lightGreen.shade300;
+
 void main() {
   final dbService = DatabaseService();
   runApp(App(dbService));
@@ -19,6 +23,25 @@ class App extends StatelessWidget {
       title: 'Bus Warbler',
       theme: ThemeData(
         primarySwatch: Colors.lightGreen,
+        canvasColor: darkGrey,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateColor.resolveWith(
+              (states) => lightGrey,
+            ),
+            foregroundColor: MaterialStateProperty.resolveWith(
+              (states) => textGreen,
+            ),
+            elevation: MaterialStateProperty.resolveWith((states) => 0.5),
+          ),
+        ),
+        textTheme: TextTheme(
+          button: TextStyle(color: textGreen),
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: lightGrey,
+          elevation: 1.0,
+        ),
       ),
       home: ChangeNotifierProvider<AppState>(
         create: (context) => AppState(dbService),
