@@ -6,27 +6,38 @@ import 'package:bus_warbler/models/serial_html.dart';
 import 'package:bus_warbler/services/db.dart';
 import 'package:flutter/material.dart';
 
+StopType currentDateToStopType([int? dayOfWeek]) {
+  final weekday = dayOfWeek ?? DateTime.now().weekday;
+  if (weekday == DateTime.sunday) {
+    return StopType.Holiday;
+  } else if (weekday == DateTime.saturday) {
+    return StopType.Saturday;
+  } else {
+    return StopType.Weekday;
+  }
+}
+
 class AppState with ChangeNotifier {
   AppState(this._databaseService);
 
   final DatabaseService _databaseService;
-  bool _loading = false;
-  bool _hasStops = false;
-  String _route = ''; //DBConsts.kanaiTotsuka;
   Map<String, Iterable<ScheduleStop>> _stopCache = {};
 
+  bool _loading = false;
   bool get loading => _loading;
   set loading(bool value) {
     _loading = value;
     notifyListeners();
   }
 
+  bool _hasStops = false;
   bool get hasStops => _hasStops;
   set hasStops(bool value) {
     _hasStops = value;
     notifyListeners();
   }
 
+  String _route = '';
   String get route => _route;
 
   /// Sets route to [value] of type [String] or [null].
@@ -38,6 +49,14 @@ class AppState with ChangeNotifier {
     }
 
     _route = value;
+    notifyListeners();
+  }
+
+  StopType _stopType = currentDateToStopType();
+  StopType get stopType => _stopType;
+  set stopType(StopType value) {
+    _stopType = value;
+    print('stop type set to ${value.index}');
     notifyListeners();
   }
 
