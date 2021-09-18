@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:bus_warbler/models/schedule_stop.dart';
 import 'package:bus_warbler/state/app_state.dart';
+import 'package:bus_warbler/extensions/indexed_map.dart';
 
 class RoutePage extends StatelessWidget {
   const RoutePage({Key? key}) : super(key: key);
@@ -73,21 +74,40 @@ class PageBody extends StatelessWidget {
         } else if (!snapshot.hasData) {
           return LinearProgressIndicator();
         } else {
+          print('${DateTime.now()}-":::: elements :::::}');
+          final limited = snapshot.data!
+              .where((stop) => _isSelectedStopType(stop, appState.stopType))
+              .where(_isInTimeWindow)
+              .take(5);
+          limited.forEach((element) => print(element));
           return Center(
-            child: ListView(
-              children: [
-                ...snapshot.data!
-                    .where(_isInTimeWindow)
-                    .where(
-                        (stop) => _isSelectedStopType(stop, appState.stopType))
-                    .take(3)
-                    .map(
-                      (item) => StopTimeListItem(
-                        key: Key(item.timeString),
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade800,
+                  borderRadius: BorderRadius.circular(4.0),
+                  border: Border.all(color: Colors.grey.shade600),
+                ),
+                child: Column(
+                  children: [
+                    ...snapshot.data!
+                        .where((stop) =>
+                            _isSelectedStopType(stop, appState.stopType))
+                        .where(_isInTimeWindow)
+                        .take(5)
+                        .map((element) {
+                      // print(element);
+                      return element;
+                    }).indexedMap(
+                      (item, index) => StopTimeListItem(
+                        key: Key('$index-${item.timeString}'),
                         item: item,
                       ),
                     ),
-              ],
+                  ],
+                ),
+              ),
             ),
           );
         }

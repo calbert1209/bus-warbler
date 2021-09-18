@@ -31,6 +31,15 @@ class ScheduleStop {
   String _doubleDigits(int i) => i < 10 ? '0' + i.toString() : i.toString();
   String get timeString => '${_doubleDigits(hour)}:${_doubleDigits(minute)}';
 
+  String toString() {
+    return {
+      'index': index,
+      'time': timeString,
+      'note': note,
+      'type': type.index,
+    }.toString();
+  }
+
   factory ScheduleStop.fromMap(Map<String, dynamic> map) {
     assert(
       DBConsts.hasStopKeys(map),
