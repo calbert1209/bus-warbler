@@ -72,10 +72,27 @@ class DatabaseService {
   Future<List<Object?>> batchInsert(
       Iterable<ExtendedScheduleStop> stops) async {
     await _ensureOpened();
+
     var batch = _database.batch();
     for (var stop in stops) {
       final table = DBConsts.toTableName(stop.header.route);
       batch.insert(table, stop.toEntityMap());
+    }
+
+    return batch.commit(continueOnError: true);
+  }
+
+  Future<List<Object?>> dropTables(Iterable<ExtendedScheduleStop> stops) async {
+    var dropped = Set<String>();
+    var batch = _database.batch();
+    for (var stop in stops) {
+      final table = DBConsts.toTableName(stop.header.route);
+      if (dropped.contains(table)) {
+        continue;
+      }
+
+      batch.execute('DROP TABLE IF EXISTS $table;');
+      dropped.add(table);
     }
 
     return batch.commit(continueOnError: true);

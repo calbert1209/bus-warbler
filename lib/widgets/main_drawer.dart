@@ -60,8 +60,8 @@ class MainDrawer extends Drawer {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    final lightGrey = Colors.grey.shade600;
-    final textGreen = Colors.lightGreen.shade300;
+    final lightGrey = Colors.grey.shade800;
+    final textGreen = Colors.green.shade300;
 
     return Drawer(
       child: ListView(
@@ -74,7 +74,7 @@ class MainDrawer extends Drawer {
                 Text(
                   'Settings & Utilities',
                   style: TextStyle(
-                    color: Colors.grey.shade900,
+                    color: Colors.grey.shade800,
                     fontSize: 24.0,
                   ),
                 ),

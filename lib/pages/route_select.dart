@@ -2,8 +2,8 @@ import 'package:bus_warbler/widgets/main_drawer.dart';
 import 'package:bus_warbler/widgets/route_select_body.dart';
 import 'package:flutter/material.dart';
 
-final lightGrey = Colors.grey.shade600;
-final textGreen = Colors.lightGreen.shade300;
+final lightGrey = Colors.grey.shade700;
+final textGreen = Colors.green.shade300;
 
 class RouteSelectPage extends StatelessWidget {
   const RouteSelectPage({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class RouteSelectPage extends StatelessWidget {
           builder: (context) => IconButton(
             icon: Icon(
               Icons.settings,
-              color: Colors.grey.shade900,
+              color: Colors.grey.shade800,
             ),
             onPressed: () {
               Scaffold.of(context).openDrawer();

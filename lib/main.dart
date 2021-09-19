@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:bus_warbler/pages/home.dart';
 import 'package:bus_warbler/state/app_state.dart';
 
-final lightGrey = Colors.grey.shade600;
-final darkGrey = Colors.grey.shade700;
-final textGreen = Colors.lightGreen.shade300;
+final lightGrey = Colors.grey.shade700;
+final darkGrey = Colors.grey.shade800;
+final textGreen = Colors.green.shade300;
 
 void main() {
   final dbService = DatabaseService();
@@ -22,7 +22,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Bus Warbler',
       theme: ThemeData(
-        primarySwatch: Colors.lightGreen,
+        primarySwatch: Colors.green,
         canvasColor: darkGrey,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(

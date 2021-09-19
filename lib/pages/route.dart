@@ -13,9 +13,9 @@ class RoutePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
 
-    final lightGrey = Colors.grey.shade600;
-    final darkGrey = Colors.grey.shade700;
-    final foregroundGreen = Colors.lightGreen.shade300;
+    final lightGrey = Colors.grey.shade700;
+    final darkGrey = Colors.grey.shade800;
+    final foregroundGreen = Colors.green.shade300;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,41 +74,35 @@ class PageBody extends StatelessWidget {
         } else if (!snapshot.hasData) {
           return LinearProgressIndicator();
         } else {
-          print('${DateTime.now()}-":::: elements :::::}');
-          final limited = snapshot.data!
+          final inWindow = snapshot.data!
               .where((stop) => _isSelectedStopType(stop, appState.stopType))
               .where(_isInTimeWindow)
-              .take(5);
-          limited.forEach((element) => print(element));
+              .toList();
+          inWindow.sort((a, b) => a.index.compareTo(b.index));
+          final limited = inWindow.take(5);
           return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade800,
-                  borderRadius: BorderRadius.circular(4.0),
-                  border: Border.all(color: Colors.grey.shade600),
-                ),
-                child: Column(
-                  children: [
-                    ...snapshot.data!
-                        .where((stop) =>
-                            _isSelectedStopType(stop, appState.stopType))
-                        .where(_isInTimeWindow)
-                        .take(5)
-                        .map((element) {
-                      // print(element);
-                      return element;
-                    }).indexedMap(
-                      (item, index) => StopTimeListItem(
-                        key: Key('$index-${item.timeString}'),
-                        item: item,
+            child: limited.length > 0
+                ? Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(4.0),
+                        border: Border.all(color: Colors.grey.shade500),
+                      ),
+                      child: Column(
+                        children: [
+                          ...limited.indexedMap(
+                            (item, index) => StopTimeListItem(
+                              key: Key('$index-${item.timeString}'),
+                              item: item,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  )
+                : Text('no stops found'),
           );
         }
       },
@@ -123,6 +117,7 @@ class StopTimeListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final noteText = item.note == null ? '' : ' (${item.note})';
     final _fakeTime =
         kDebugMode && (DateTime.now().hour > 22 || DateTime.now().hour < 7);
     return Padding(
@@ -133,12 +128,24 @@ class StopTimeListItem extends StatelessWidget {
           Flexible(
             flex: 1,
             child: Center(
-              child: Text(
-                '${_fakeTime ? '▵' : ''}${item.timeString}',
-                style: TextStyle(
-                  fontSize: 48,
-                  color: Colors.lightGreen.shade300,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${_fakeTime ? '▵' : ''}${item.timeString}',
+                    style: TextStyle(
+                      fontSize: 48,
+                      color: Colors.green.shade300,
+                    ),
+                  ),
+                  Text(
+                    noteText,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.green.shade300,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

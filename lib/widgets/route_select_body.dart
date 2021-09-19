@@ -14,7 +14,7 @@ class RouteSelectBody extends StatelessWidget {
       children: [
         ...DBConsts.tableNames.map((name) {
           return Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 32.0, left: 32.0, right: 32.0),
             child: ElevatedButton(
               onPressed: () => appState.route = name,
               child: Padding(

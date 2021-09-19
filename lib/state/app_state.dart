@@ -78,12 +78,5 @@ class AppState with ChangeNotifier {
     assert(this._route != '', '_route should not be an empty string');
 
     return this.queryAll(this._route);
-    // if (!_stopCache.containsKey(tableName) || _stopCache[tableName] == null) {
-    //   final results = await _databaseService.queryAll(tableName);
-    //   _stopCache[tableName] = results;
-    // }
-
-    // // _stopCache[tableName] could never be null
-    // return Future.value(_stopCache[tableName]!);
   }
 }
