@@ -17,13 +17,18 @@ class RouteSelectPage extends StatelessWidget {
           'Pick a route',
           style: TextStyle(
             color: textGreen,
+            fontFamily: 'MPlusRounded',
+            fontWeight: FontWeight.w700,
+            letterSpacing: -1,
+            fontSize: 28.0,
           ),
         ),
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(
-              Icons.settings,
-              color: Colors.grey.shade800,
+              Icons.settings_rounded,
+              color: Colors.grey.shade900,
+              size: 28,
             ),
             onPressed: () {
               Scaffold.of(context).openDrawer();

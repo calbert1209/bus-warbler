@@ -23,10 +23,17 @@ class RoutePage extends StatelessWidget {
           appState.route,
           style: TextStyle(
             color: foregroundGreen,
+            fontFamily: 'MPlusRounded',
+            fontWeight: FontWeight.w700,
+            letterSpacing: -1,
+            fontSize: 28.0,
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            size: 32,
+          ),
           onPressed: () => appState.route = '',
           color: foregroundGreen,
         ),
@@ -129,11 +136,16 @@ class StopTimeListItem extends StatelessWidget {
             flex: 1,
             child: Center(
               child: Row(
+                textBaseline: TextBaseline.alphabetic,
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
                 children: [
                   Text(
-                    '${_fakeTime ? '▵' : ''}${item.timeString}',
+                    '${_fakeTime ? '▴' : ''}${item.timeString}',
                     style: TextStyle(
+                      fontFamily: 'MPlusRounded',
+                      letterSpacing: -3.0,
+                      fontWeight: FontWeight.w500,
                       fontSize: 48,
                       color: Colors.green.shade300,
                     ),
@@ -141,6 +153,8 @@ class StopTimeListItem extends StatelessWidget {
                   Text(
                     noteText,
                     style: TextStyle(
+                      fontFamily: 'MPlusRounded',
+                      fontWeight: FontWeight.w400,
                       fontSize: 20,
                       color: Colors.green.shade300,
                     ),

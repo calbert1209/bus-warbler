@@ -16,7 +16,7 @@ class BottomNavTextBar extends StatelessWidget {
           )
           .toList(),
       currentIndex: appState.stopType.index,
-      backgroundColor: Colors.grey.shade800,
+      backgroundColor: Colors.grey.shade900,
       showSelectedLabels: false,
       showUnselectedLabels: false,
       onTap: (index) => appState.stopType = StopType.values[index],
@@ -31,9 +31,11 @@ class TextNavBarItem extends BottomNavigationBarItem {
             text,
             style: TextStyle(
               color: selected != null && selected
-                  ? Colors.green.shade700
-                  : Colors.green.shade300,
+                  ? Colors.green.shade300
+                  : Colors.grey.shade800,
               fontSize: 24.0,
+              fontFamily: 'MPlusRounded',
+              fontWeight: FontWeight.w900,
             ),
           ),
           label: text,
