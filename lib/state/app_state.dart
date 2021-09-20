@@ -4,6 +4,7 @@ import 'package:bus_warbler/constants/db_consts.dart';
 import 'package:bus_warbler/models/schedule_stop.dart';
 import 'package:bus_warbler/models/serial_html.dart';
 import 'package:bus_warbler/services/db.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 StopType currentDateToStopType([int? dayOfWeek]) {
@@ -34,6 +35,15 @@ class AppState with ChangeNotifier {
   bool get hasStops => _hasStops;
   set hasStops(bool value) {
     _hasStops = value;
+    notifyListeners();
+  }
+
+  bool get debugMode => kDebugMode;
+
+  int _debugOffset = 0;
+  int get debugOffset => _debugOffset;
+  set debugOffset(int value) {
+    _debugOffset = value;
     notifyListeners();
   }
 

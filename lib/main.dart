@@ -32,7 +32,7 @@ class App extends StatelessWidget {
             foregroundColor: MaterialStateProperty.resolveWith(
               (states) => textGreen,
             ),
-            elevation: MaterialStateProperty.resolveWith((states) => 0.5),
+            elevation: MaterialStateProperty.resolveWith((states) => 1.0),
           ),
         ),
         textTheme: TextTheme(

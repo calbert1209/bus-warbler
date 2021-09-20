@@ -49,19 +49,6 @@ class RoutePage extends StatelessWidget {
 class PageBody extends StatelessWidget {
   const PageBody({Key? key}) : super(key: key);
 
-  bool _isInTimeWindow(ScheduleStop stop) {
-    var now = DateTime.now();
-    if (now.hour > 22) {
-      now = now.subtract(Duration(hours: 12));
-    } else if (now.hour < 7) {
-      now = now.add(Duration(hours: 10));
-    }
-
-    final indexNow = (now.hour * 60) + now.minute;
-
-    return stop.index > indexNow && stop.index <= (indexNow + 60);
-  }
-
   bool _isSelectedStopType(ScheduleStop stop, StopType current) {
     return stop.type == current;
   }
@@ -69,6 +56,18 @@ class PageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+
+    var now = DateTime.now();
+    if (appState.debugMode) {
+      now = now.add(Duration(hours: appState.debugOffset));
+    }
+
+    bool _isInTimeWindow(ScheduleStop stop) {
+      final indexNow = (now.hour * 60) + now.minute;
+
+      return stop.index > indexNow && stop.index <= (indexNow + 60);
+    }
+
     return FutureBuilder<Iterable<ScheduleStop>>(
       future: appState.queryAllForCurrentRoute(),
       builder: (context, snapshot) {
@@ -124,9 +123,9 @@ class StopTimeListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     final noteText = item.note == null ? '' : ' (${item.note})';
-    final _fakeTime =
-        kDebugMode && (DateTime.now().hour > 22 || DateTime.now().hour < 7);
+    final _fakeTime = appState.debugOffset != 0;
     return Padding(
       padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
       child: Flex(

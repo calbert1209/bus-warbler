@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bus_warbler/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bus_warbler/constants/bus_routes.dart';
@@ -74,13 +75,13 @@ class MainDrawer extends Drawer {
                 Text(
                   'Settings & Utilities',
                   style: TextStyle(
-                    color: Colors.grey.shade800,
+                    color: Colors.grey.shade900,
                     fontSize: 24.0,
                   ),
                 ),
               ],
             ),
-            decoration: BoxDecoration(color: lightGrey),
+            decoration: BoxDecoration(color: textGreen),
           ),
           ListTile(
             contentPadding: EdgeInsets.all(8.0),
@@ -96,7 +97,92 @@ class MainDrawer extends Drawer {
               _fetchAndParse(appState)
                   .whenComplete(() => Navigator.pop(context));
             },
-          )
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.all(8.0),
+            leading: Icon(
+              Icons.check,
+              color: appState.debugOffset == -8 ? textGreen : darkGrey,
+            ),
+            title: Text(
+              '-8 Hours',
+              style: TextStyle(color: textGreen, fontSize: 24.0),
+            ),
+            onTap: () {
+              if (appState.debugOffset == -8) {
+                return;
+              }
+              appState.debugOffset = -8;
+            },
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.all(8.0),
+            leading: Icon(
+              Icons.check,
+              color: appState.debugOffset == -4 ? textGreen : darkGrey,
+            ),
+            title: Text(
+              '-4 Hours',
+              style: TextStyle(color: textGreen, fontSize: 24.0),
+            ),
+            onTap: () {
+              if (appState.debugOffset == -4) {
+                return;
+              }
+              appState.debugOffset = -4;
+            },
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.all(8.0),
+            leading: Icon(
+              Icons.check,
+              color: appState.debugOffset == 0 ? textGreen : darkGrey,
+            ),
+            title: Text(
+              '+0 Hours',
+              style: TextStyle(color: textGreen, fontSize: 24.0),
+            ),
+            onTap: () {
+              if (appState.debugOffset == 0) {
+                return;
+              }
+              appState.debugOffset = 0;
+            },
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.all(8.0),
+            leading: Icon(
+              Icons.check,
+              color: appState.debugOffset == 4 ? textGreen : darkGrey,
+            ),
+            title: Text(
+              '+4 Hours',
+              style: TextStyle(color: textGreen, fontSize: 24.0),
+            ),
+            onTap: () {
+              if (appState.debugOffset == 4) {
+                return;
+              }
+              appState.debugOffset = 4;
+            },
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.all(8.0),
+            leading: Icon(
+              Icons.check,
+              color: appState.debugOffset == 8 ? textGreen : darkGrey,
+            ),
+            title: Text(
+              '+8 Hours',
+              style: TextStyle(color: textGreen, fontSize: 24.0),
+            ),
+            onTap: () {
+              if (appState.debugOffset == 8) {
+                return;
+              }
+              appState.debugOffset = 8;
+            },
+          ),
         ],
       ),
     );
