@@ -1,3 +1,4 @@
+import 'package:bus_warbler/constants/db_consts.dart';
 import 'package:bus_warbler/widgets/bottom_nav_text_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -20,12 +21,12 @@ class RoutePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          appState.route,
+          localizedRouteNameFor(appState.route),
           style: TextStyle(
             color: foregroundGreen,
             fontFamily: 'MPlusRounded',
             fontWeight: FontWeight.w700,
-            letterSpacing: -1,
+            letterSpacing: -1.0,
             fontSize: 28.0,
           ),
         ),

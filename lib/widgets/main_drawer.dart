@@ -61,7 +61,7 @@ class MainDrawer extends Drawer {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    final lightGrey = Colors.grey.shade800;
+    // final lightGrey = Colors.grey.shade800;
     final textGreen = Colors.green.shade300;
 
     return Drawer(

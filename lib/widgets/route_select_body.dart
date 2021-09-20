@@ -20,9 +20,12 @@ class RouteSelectBody extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  name,
+                  localizedRouteNameFor(name),
                   style: TextStyle(
+                    fontFamily: 'MPlusRounded',
                     fontSize: 32.0,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: -1.0,
                   ),
                 ),
               ),

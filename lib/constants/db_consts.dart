@@ -63,3 +63,20 @@ create table $tableName (
         .every((key) => item.containsKey(key));
   }
 }
+
+const LocalizedRouteNames = {
+  'ja-jp': {
+    'kanai_ofuna': '金井 → 大船',
+    'ofuna_kanai': '大船 → 金井',
+    'kanai_totsuka': '金井 → 戸塚',
+    'totsuka_kanai': '戸塚 → 金井',
+  }
+};
+
+String localizedRouteNameFor(String tableName, [String locale = 'ja-jp']) {
+  DBConsts.assertTableName(tableName);
+  final localInDictionary = LocalizedRouteNames.keys.contains(locale);
+  assert(localInDictionary, 'locale should be in dictionary');
+
+  return LocalizedRouteNames[locale]![tableName]!;
+}
