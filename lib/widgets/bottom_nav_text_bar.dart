@@ -33,7 +33,7 @@ class TextNavBarItem extends BottomNavigationBarItem {
               color: selected != null && selected
                   ? Colors.green.shade300
                   : Colors.grey.shade800,
-              fontSize: 24.0,
+              fontSize: 32.0,
               fontFamily: 'MPlusRounded',
               fontWeight: FontWeight.w900,
             ),
