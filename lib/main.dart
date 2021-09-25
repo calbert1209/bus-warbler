@@ -43,6 +43,7 @@ class App extends StatelessWidget {
           elevation: 1.0,
         ),
       ),
+      debugShowCheckedModeBanner: false,
       home: ChangeNotifierProvider<AppState>(
         create: (context) => AppState(dbService),
         builder: (context, _) => HomePage(),
